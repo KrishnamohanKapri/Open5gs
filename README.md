@@ -47,14 +47,18 @@ sudo install minikube-linux-amd64 /usr/local/bin/minikube && rm minikube-linux-a
 ## Initialized minikube
 1. Check docker status  
 `systemctl status docker`  
+
 2. If docker engine not running  
 `systemctl start docker`  
+
 3. Initialize minikube single-node cluster  
 `minikube start -p one --cpus 6 --memory 8192`  
+
 4. Check status if everything is running  
 `minikube profile list`  
 `kubectl get node`  
 `kubectl get all --all-namespaces`  
+
 5. Access kubernetes dashboard  
 `minikube -p one dashboard`
 
