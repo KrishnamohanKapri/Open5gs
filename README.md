@@ -102,4 +102,4 @@ Need help in installing and configuring
 - prometheus to fetch metrics from open5gs pods
 - grafana to query and visualize logs from loki and metrics from prometheus
 
-## Currently stuck here
+Currently stuck here
