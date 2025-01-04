@@ -5,9 +5,9 @@ Current Status: Configuring the environment
 Setup VMWare:  
 OS: Ubuntu 22.04 LTE  
 Hardware allocation:  
-    - cpu cores: 8  
-    - memory: 12GB  
-    - storage: 120GB  
+- cpu cores: 8  
+- memory: 12GB  
+- storage: 120GB  
 
 ## Setup Docker  
 1. Adding docker's apt repository  
@@ -44,5 +44,5 @@ sudo install minikube-linux-amd64 /usr/local/bin/minikube && rm minikube-linux-a
 
 ## Setup Helm  
 Installing Helm
-`sudo snap install helm --classic`
+`sudo snap install helm --classic`  
 [Installation Guide](https://helm.sh/docs/intro/install/)
