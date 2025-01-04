@@ -1,2 +1,4 @@
 # Open5gs
-Research Project
+Research Project 
+Status: Configuring the environment
+
