@@ -1,0 +1,50 @@
+alertmanager:
+  enabled: false
+
+server:
+  extraScrapeConfigs:
+    - job_name: 'kubernetes-pods'
+      kubernetes_sd_configs:
+        - role: pod
+      relabel_configs:
+        - action: labelmap
+          regex: __meta_kubernetes_pod_label_(.+)
+        - source_labels: [__meta_kubernetes_namespace]
+          action: replace
+          target_label: namespace
+        - source_labels: [__meta_kubernetes_pod_name]
+          action: replace
+          target_label: pod
+        - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+          action: keep
+          regex: true
+
+
+  # Resource limits for Prometheus server
+  resources:
+    limits:
+      memory: 2Gi
+      cpu: 1
+    requests:
+      memory: 1Gi
+      cpu: 500m
+
+nodeExporter:
+  enabled: true
+
+kubeStateMetrics:
+  enabled: true
+
+pushgateway:
+  enabled: false
+
+serverFiles:
+  prometheus.yml:
+    scrape_configs:
+      - job_name: 'kubernetes-pods-metrics'
+        kubernetes_sd_configs:
+          - role: pod
+        metric_relabel_configs:
+          - source_labels: [__name__]
+            regex: 'container_cpu_usage_seconds_total|container_memory_working_set_bytes|container_network_receive_bytes_total|container_network_transmit_bytes_total'
+            action: keep

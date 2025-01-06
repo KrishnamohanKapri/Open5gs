@@ -107,3 +107,35 @@ Need help in installing and configuring
 - grafana to query and visualize logs from loki and metrics from prometheus
 
 Currently stuck here
+
+
+# Setting up Prometheus 
+```
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+```
+```
+helm repo update
+```
+```
+helm install prometheus prometheus-community/prometheus --namespace monitoring --create-namespace
+```
+To apply our custom configuration we run:
+```
+helm upgrade --install prometheus prometheus-community/prometheus   --namespace monitoring   --values deployments/prometheus-values.yaml
+```
+
+deploy grafana
+```
+helm repo add grafana https://grafana.github.io/helm-charts
+```
+```
+helm repo update
+```
+```
+helm install grafana grafana/grafana \
+  --namespace monitoring \
+  --create-namespace \
+  --set adminPassword='admin' \
+  --set persistence.enabled=true \
+  --set persistence.size=5Gi
+```
