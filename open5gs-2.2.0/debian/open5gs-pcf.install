@@ -1,3 +1,0 @@
-usr/bin/open5gs-pcfd
-configs/open5gs/pcf.yaml etc/open5gs
-configs/systemd/open5gs-pcfd.service lib/systemd/system

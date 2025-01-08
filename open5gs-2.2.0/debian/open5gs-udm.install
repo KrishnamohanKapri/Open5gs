@@ -1,3 +1,0 @@
-usr/bin/open5gs-udmd
-configs/open5gs/udm.yaml etc/open5gs
-configs/systemd/open5gs-udmd.service lib/systemd/system

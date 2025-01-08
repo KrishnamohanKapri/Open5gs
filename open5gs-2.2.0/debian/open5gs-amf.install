@@ -1,3 +1,0 @@
-usr/bin/open5gs-amfd
-configs/open5gs/amf.yaml etc/open5gs
-configs/systemd/open5gs-amfd.service lib/systemd/system
