@@ -27,9 +27,11 @@ sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt-get update  
 ```  
 3. Install the latest docker version  
-`sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin`  
+```
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+```
 
-[Installation Guide followed](https://docs.docker.com/engine/install/ubuntu/)  
+Installation Guide followed: https://docs.docker.com/engine/install/ubuntu/
       
 ## Installed Minikube
 ```
@@ -37,45 +39,58 @@ curl -LO https://github.com/kubernetes/minikube/releases/latest/download/minikub
 sudo install minikube-linux-amd64 /usr/local/bin/minikube && rm minikube-linux-amd64
 ```
 
-[Installation Guide followed](https://minikube.sigs.k8s.io/docs/start/?arch=%2Flinux%2Fx86-64%2Fstable%2Fbinary+download)
+Installation Guide followed: https://minikube.sigs.k8s.io/docs/start/?arch=%2Flinux%2Fx86-64%2Fstable%2Fbinary+download
 
 ## Installed Helm
-`sudo snap install helm --classic`  
+```
+sudo snap install helm --classic
+```  
 
-[Installation Guide followed](https://helm.sh/docs/intro/install/)
+Installation Guide followed: https://helm.sh/docs/intro/install/
 
 ## Initialized minikube
 1. Check docker status  
-`systemctl status docker`  
+```
+systemctl status docker
+```  
 
 2. If docker engine not running  
-`systemctl start docker`  
+```
+systemctl start docker
+```
 
 3. Initialize minikube single-node cluster  
-`minikube start -p one --cpus 6 --memory 8192`  
+```
+minikube start -p one --cpus 6 --memory 8192
+```
 
 4. Check status if everything is running  
-`minikube profile list`  
-`kubectl get node`  
-`kubectl get all --all-namespaces`  
+```
+minikube profile list
+kubectl get node
+kubectl get all --all-namespaces
+```
 
 5. Access kubernetes dashboard  
-`minikube -p one dashboard`
+```
+minikube -p one dashboard
+```
 
 ## Deploying Open5gs and UERANSIM-gnb
-1. Pulled the repo
+1. Deployed Open5gs with custom changes from local system
 ```
-helm pull oci://registry-1.docker.io/gradiant/open5gs --version 2.2.0
-helm pull oci://registry-1.docker.io/gradiant/ueransim-gnb --version 0.2.6
+helm install open5gs ./open5gs/ --values 5gSA-values.yaml -n default
 ```
-2. Deployed Open5gs  
-`helm install open5gs oci://registry-1.docker.io/gradiant/open5gs --version 2.2.0 --values https://gradiant.github.io/5g-charts/docs/open5gs-ueransim-gnb/5gSA-values.yaml`
 
-3. Deployed RAN  
-`helm install ueransim-gnb oci://registry-1.docker.io/gradiant/ueransim-gnb --version 0.2.6 --values https://gradiant.github.io/5g-charts/docs/open5gs-ueransim-gnb/gnb-ues-values.yaml`
+3. Deployed RAN from local system
+```
+helm install ueransim-gnb ./ueransim-gnb/ --values gnb-ues-values.yaml -n default
+```
 
-4. Check deployment  
-`kubectl get pods`  
+4. Check deployment
+```
+kubectl get pods -n default
+```
 
 Output:
 ```
@@ -98,12 +113,44 @@ Output:
     ueransim-gnb-ues-548b796f87-9lpc6   1/1     Running   2 (6m55s ago)   8m20s
 ```
 
-[Guide followed](https://gradiant.github.io/5g-charts/open5gs-ueransim-gnb.html)
+Guide followed: https://gradiant.github.io/5g-charts/open5gs-ueransim-gnb.html
 
-## Deploying and Configuring logging and monitoring tools
-Need help in installing and configuring  
-- loki to fetch logs from open5gs pods
-- prometheus to fetch metrics from open5gs pods
-- grafana to query and visualize logs from loki and metrics from prometheus
+## Deploying and Configuring monitoring tools
+1. Pulling prometheus repo
+```
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+```
 
-Currently stuck here
+2. Installing prometheus-grafana stack in monitoring namespace
+```
+kubectl create namespace monitoring
+helm install prometheus prometheus-community/kube-prometheus-stack -n monitoring
+```
+
+3. Accessing Grafana and prometheus on localhost
+```
+kubectl port-forward service/prometheus-kube-prometheus-prometheus 9092:9090 -n monitoring
+kubectl port-forward service/prometheus-grafana 3000:80 -n monitoring
+```
+
+Guide followed: https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/README.md
+
+## Issue
+Trying to configure amf pod to enable metrics dumping into the cluster
+Not able to configure or enable the prometheus scraping for open5gs 2.2.0 pods using these tutorials   
+https://open5gs.org/open5gs/docs/tutorial/04-metrics-prometheus/   
+https://github.com/s5uishida/open5gs_5gc_ueransim_metrics_sample_config   
+https://github.com/CarlosGuemS/Open5GS-Prometheus-for-Beginners   
+
+Need help to configure prometheus metrics scraping from amf, smf, upf and pcf pods
+
+Should get target health like this   
+
+![expected output](./Images/image.png)
+
+Getting target health like this   
+
+![current output](./Images/image_2.png)
+
+Prometheus relies on service discovery to dynamically find targets to scrape. Here Prometheus is not able to fetch the amf pod metrics, which means amf pod is not exposing the metrics in the cluster, or if it is exposing then maybe Prometheus is not getting the correct port where amf pod is exposing the metrics. So, I will need to define the target port for Prometheus explicitly but I am not able to understand the YAML configuration file, starting with amf pod I tried to change the existing configuration but still I am not able to understand how I can explicitly define the port.
