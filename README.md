@@ -144,13 +144,3 @@ https://github.com/s5uishida/open5gs_5gc_ueransim_metrics_sample_config
 https://github.com/CarlosGuemS/Open5GS-Prometheus-for-Beginners   
 
 Need help to configure prometheus metrics scraping from amf, smf, upf and pcf pods
-
-Should get target health like this   
-
-![expected output](./Images/image.png)
-
-Getting target health like this   
-
-![current output](./Images/image_2.png)
-
-Prometheus relies on service discovery to dynamically find targets to scrape. Here Prometheus is not able to fetch the amf pod metrics, which means amf pod is not exposing the metrics in the cluster, or if it is exposing then maybe Prometheus is not getting the correct port where amf pod is exposing the metrics. So, I will need to define the target port for Prometheus explicitly but I am not able to understand the YAML configuration file, starting with amf pod I tried to change the existing configuration but still I am not able to understand how I can explicitly define the port.
